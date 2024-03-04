@@ -1,9 +1,9 @@
+import os
+
+import base64
 from flask import Flask, render_template, request
 import json
 from tqdm import tqdm
-import os
-from flask import url_for, send_file
-import base64
 
 app = Flask(__name__, template_folder="templates")
 
@@ -20,7 +20,6 @@ print(f"LOADED: {len(dataset)} EXAMPLES")
 def get_matching_results(prompt, max_res=10):
     return [x for x in dataset if prompt in x["prompt"]][:max_res]
         
-
 @app.route("/search/<prompt>")
 def search(prompt):
     results = get_matching_results(prompt)
