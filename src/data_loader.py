@@ -26,7 +26,7 @@ class DataLoader:
                 )
                 json_file.write(
                     json.dumps({
-                        "prompt": item["prompt"], "image": f"./images/{idx}.jpeg"
+                        "prompt": item["prompt"], "image": f"./images/{idx}.jpg"
                     }) + "\n"
                 )
                 if len(found_prompts) >= max_examples:
