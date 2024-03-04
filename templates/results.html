@@ -1,0 +1,13 @@
+<html>
+    <body>
+        <ul>
+            {% for result in results %}
+            <li>
+                <p>{{result['prompt']}}</p>
+                <br />
+                <img src="{{ result['encoded_image'] }}" alt="{{ result['prompt'] }}">
+            </li>
+            {% endfor %}
+        </ul>
+    </body>
+</html>
