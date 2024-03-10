@@ -11,7 +11,7 @@ This repository contains code related to the final project of
 
 ## Getting started
 
-1. run `pip install requirements.txt` to install all the required dependencies
+1. run `pip install -r requirements.txt` to install all the required dependencies
 2. run `python get_data.py` to download the dataset
 3. run `python app.py` to run the web app
 4. navigate to `localhost:5000/search/robot` to search for `robot`
