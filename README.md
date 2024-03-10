@@ -8,3 +8,10 @@ This repository contains code related to the final project of
 - [Project Team Tasks](https://docs.google.com/document/d/1n_YQuL9-CeGPTlXEqUlfWlNgd00ygJ2FoBVJS8xYR94/edit)
 - [Project Drive](https://drive.google.com/drive/folders/1tlR_83Kof5RTz8a66ZOJtygNr57252UU)
 - [DiffusionDB](https://github.com/poloclub/diffusiondb)
+
+## Getting started
+
+1. run `pip install -r requirements.txt` to install all the required dependencies
+2. run `python get_data.py` to download the dataset
+3. run `python app.py` to run the web app
+4. navigate to `localhost:5000/search/robot` to search for `robot`
