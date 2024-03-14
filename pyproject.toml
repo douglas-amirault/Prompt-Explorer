@@ -1,0 +1,15 @@
+[tool.poetry]
+name = "crowdsourced-aipe"
+version = "0.1.0"
+description = "Our project for the Data & Visual Analytics course."
+authors = ["Andrew Getz andrew.getz@gatech.edu"]
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry.dependencies]
+python = "^3.8"
+flask = "^2.0"
+numpy = "^1.21"
+tqdm = "^4.62"
