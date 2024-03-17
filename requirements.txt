@@ -1,6 +1,10 @@
+dash
 datasets
 flask
+joblib
 numpy
 pillow
+scikit-learn
 spacy
 tqdm
+transformers

@@ -7,7 +7,6 @@ from PIL import Image
 import os
 import io
 import base64
-from io import BytesIO
 import re
 
 
@@ -52,16 +51,20 @@ app.layout = html.Div(
 
 
 @app.callback(
-    Output("search-results", "children"),
+    [
+        Output("search-results", "children"),
+        Output("text-search", "value"),
+        Output("upload-image", "contents"),
+    ],
     [Input("text-search", "value"), Input("upload-image", "contents")],
 )
-def text_search(search_term, image):
+def search(search_term, image):
     if image:
-        return image_search(image)
+        return image_search(image), "", ""
     elif search_term:
-        return text_search(search_term)
+        return text_search(search_term), search_term, ""
     else:
-        return []
+        return [], "", ""
 
 
 def text_search(search_term):
