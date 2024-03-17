@@ -1,4 +1,6 @@
 .DS_Store
 dataset/
 images/
-src/__pycache__/
+venv/
+*.pkl
+*.pyc

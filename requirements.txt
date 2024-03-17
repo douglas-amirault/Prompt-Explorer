@@ -1,5 +1,12 @@
+dash
 datasets
 flask
+joblib
 numpy
 pillow
+scikit-learn
+spacy
+torch
+torchvision
 tqdm
+transformers

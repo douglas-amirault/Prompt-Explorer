@@ -11,9 +11,18 @@ This repository contains code related to the final project of
 
 ## Getting started
 
-1. run `pip install -r requirements.txt` to install all the required dependencies
-2. run `python get_data.py` to download the dataset
-3. run `python app.py` to run the web app
-4. navigate to `localhost:5000/search/robot` to search for `robot`
-
-Note: Step 2 requires approximately 50 minutes to complete and uses 0.1 GB of disk space.
+1. Set up a Python virtual environment:
+    - **For Windows**:
+        ```
+        python -m venv venv
+        .\\venv\\Scripts\\activate
+        ```
+    - **For Mac/Linux**:
+        ```
+        python3 -m venv venv
+        source venv/bin/activate
+        ```
+2. run `pip install -r requirements.txt` to install all the required dependencies
+3. run `python get_data.py` to download the dataset
+4. run `python app.py` to run the web app
+5. navigate to `http://127.0.0.1:8050/` to view the web app in your browser
