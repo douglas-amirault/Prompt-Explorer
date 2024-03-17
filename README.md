@@ -24,8 +24,5 @@ This repository contains code related to the final project of
         ```
 2. run `pip install -r requirements.txt` to install all the required dependencies
 3. run `python get_data.py` to download the dataset
-4. run `python -m spacy download en_core_web_lg` to download the large English language model for spaCy
-5. run `python app.py` to run the web app
-6. navigate to `127.0.0.1:5000/search/robot` to search for `robot`
-
-Note: Step 3 requires approximately 50 minutes to complete.
+4. run `python app.py` to run the web app
+5. navigate to `http://127.0.0.1:8050/` to view the web app in your browser
