@@ -23,26 +23,48 @@ app = dash.Dash(__name__)
 text_search_bar = dcc.Input(
     id="text-search",
     type="text",
-    placeholder="Search items",
+    placeholder="Enter search string here...",
     debounce=True,
-    style={"display": "flex", "text-align": "center", "margin": "auto", "width": "60%"},
+    style={"display": "flex", "text-align": "center", "margin": "auto", "width": "70%"},
 )
 
 image_search_button = dcc.Upload(
     id="upload-image",
-    children=html.Button("📸"),
+    children=html.Button("📸", style={"width": "100px"}),
     accept="image/*",
-    style={"display": "flex"},
+    style={"display": "flex", "width": "100px"},
 )
+
+logo = html.Img(src="/assets/logo.png", style={"height": "50px", "margin-right": "10px", "padding-left": "20px"})
 
 app.layout = html.Div(
     [
         html.Div(
-            [text_search_bar, image_search_button],
+            [logo, html.H1("Crowdsource AI", style={"margin-left": "10px"})],
             style={
                 "display": "flex",
-                "justify-content": "center",
-                "margin": "10px auto",
+                "align-items": "center",
+                "width": "100%",
+                "height": "50px",
+                "background-color": "#ffd700",
+                "border": "1px solid #000",
+                "box-sizing": "border-box",
+                "border-radius": "10px",
+            },
+        ),
+        html.Div(
+            [html.H3("Input Prompt", style={"margin-left": "10px"}), text_search_bar, image_search_button],
+            style={
+                "justify-content": "space-between",
+                "align-items": "center",
+                "width": "50%",
+                "height": "50px",
+                "margin": "10px 0",
+                "padding": "10px",
+                "border": "1px solid #808080",
+                "box-sizing": "border-box",
+                "border-radius": "10px",
+                "display": "flex",
             },
         ),
         html.Div(id="search-results"),
