@@ -30,9 +30,9 @@ text_search_bar = dcc.Input(
 
 image_search_button = dcc.Upload(
     id="upload-image",
-    children=html.Button("📸", style={"width": "100px"}),
+    children=html.Button("📸", style={"width": "50px"}),
     accept="image/*",
-    style={"display": "flex", "width": "100px"},
+    style={"display": "flex", "width": "50px"},
 )
 
 logo = html.Img(src="/assets/logo.png", style={"height": "50px", "margin-right": "10px", "padding-left": "20px"})
@@ -53,7 +53,7 @@ app.layout = html.Div(
             },
         ),
         html.Div(
-            [html.H3("Input Prompt", style={"margin-left": "10px"}), text_search_bar, image_search_button],
+            [html.H3("Input Prompt", style={"margin-left": "10px", "font-size": "15px"}), text_search_bar, image_search_button],
             style={
                 "justify-content": "space-between",
                 "align-items": "center",
@@ -70,8 +70,7 @@ app.layout = html.Div(
         html.Div(id="search-results"),
     ]
 )
-
-
+ 
 @app.callback(
     [
         Output("search-results", "children"),
