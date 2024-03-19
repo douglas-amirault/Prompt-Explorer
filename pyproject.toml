@@ -2,11 +2,12 @@
 name = "crowdsourced-aipe"
 version = "0.1.0"
 description = "Our project for the Data & Visual Analytics course."
-authors = ["Andrew Getz andrew.getz@gatech.edu"]
+authors = ["Andrew Getz <andrew.getz@gatech.edu>"]
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
+package-mode = false
 
 [tool.poetry.dependencies]
 python = "^3.9"
