@@ -12,18 +12,24 @@ This repository contains code related to the final project of
 
 ## Getting started
 
-1. Set up a Python virtual environment:
-    - **For Windows**:
+1. Set up a Python virtual environment in one of the following ways:
+    - **Using venv**:
+        - **For Windows**:
+            ```
+            python -m venv venv
+            .\\venv\\Scripts\\activate
+            ```
+        - **For Mac/Linux**:
+            ```
+            python3 -m venv venv
+            source venv/bin/activate
+            ```
+    - **Using [Poetry](https://python-poetry.org/docs/)**:
         ```
-        python -m venv venv
-        .\\venv\\Scripts\\activate
+        poetry install
+        poetry shell
         ```
-    - **For Mac/Linux**:
-        ```
-        python3 -m venv venv
-        source venv/bin/activate
-        ```
-2. run `pip install -r requirements.txt` to install all the required dependencies
-3. run `python get_data.py` to download the dataset
-4. run `python app.py` to run the web app
-5. navigate to `http://127.0.0.1:8050/` to view the web app in your browser
+2. If not using Poetry, run `pip install -r requirements.txt` to install all the required dependencies.
+3. Run `python get_data.py` to download the dataset.
+4. Run `python app.py` to run the web app.
+5. Navigate to [http://127.0.0.1:8050/](http://127.0.0.1:8050/) to view it in your browser.
