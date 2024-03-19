@@ -40,20 +40,20 @@ logo = html.Img(src="/assets/logo.png", style={"height": "50px", "margin-right":
 app.layout = html.Div(
     [
         html.Div(
-            [logo, html.H1("Crowdsource AI", style={"margin-left": "10px"})],
+            [logo, html.H1("Crowdsource AI", style={"margin-left": "10px", "font-family": "Arial, sans-serif"})],
             style={
                 "display": "flex",
                 "align-items": "center",
                 "width": "100%",
                 "height": "50px",
                 "background-color": "#ffd700",
-                "border": "1px solid #000",
+                "border": "2px solid #000",
                 "box-sizing": "border-box",
                 "border-radius": "10px",
             },
         ),
         html.Div(
-            [html.H3("Input Prompt", style={"margin-left": "10px", "font-size": "15px"}), text_search_bar, image_search_button],
+            [html.H3("Input Prompt", style={"margin-left": "10px", "font-size": "15px", "font-family": "Arial, sans-serif"}), text_search_bar, image_search_button],
             style={
                 "justify-content": "space-between",
                 "align-items": "center",
@@ -67,7 +67,7 @@ app.layout = html.Div(
                 "display": "flex",
             },
         ),
-        html.Div(id="search-results"),
+        html.Div(id="search-results", style={"overflow": "auto", "height": "100vh"})
     ]
 )
  

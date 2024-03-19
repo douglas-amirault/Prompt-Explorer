@@ -2,8 +2,39 @@ from dash import html
 import base64
 
 styles = {
-    "result-image": {"max-width": "30%", "display": "inline"},
-    "result-description": {"textAlign": "center", "display": "inline"},
+    "result-card": {
+        "display": "flex", 
+        "flex-direction": "row", 
+        "border": "1px solid #808080",
+        "padding": "10px",
+        "margin": "10px 0",
+        "width": "48.7%",
+        "border-radius": "10px",
+        "justify-content": "space-between"
+
+    },
+    
+    "result-image": {
+        "max-width": "30%", 
+        "max-height": "200px", 
+        "display": "inline"    
+    },
+    
+    "result-description": {
+        "textAlign": "left", 
+        "display": "inline", 
+        "background-color": "#f2f2f2", 
+        "width": "50%", 
+        "padding": "10px",
+        "border-radius": "10px",
+        "font-family": "Arial, sans-serif"
+    },
+
+    "result-title": {
+        "margin-top": "0px",
+        "font-family": "Arial, sans-serif"
+
+    }
 }
 
 
@@ -21,10 +52,12 @@ def create_result_card(image_url, description):
                 style=styles["result-image"],
             ),
             html.Div(
-                description,
-                className="result-description",
+                children=[
+                    html.H3("Prompt", className="result-title", style=styles["result-title"]),
+                    html.P(description, className="result-description"),
+                ],
                 style=styles["result-description"],
             ),
         ],
-        style=styles,
+        style=styles["result-card"],
     )
