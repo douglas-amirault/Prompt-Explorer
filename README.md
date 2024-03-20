@@ -6,6 +6,7 @@ This repository contains code related to the final project of
 - [Project Description](https://docs.google.com/document/d/e/2PACX-1vSlYrMw402tL3F95ay-AaptTdF80UOER-gne_O0kqbuuk6WXrlsjwaYjjS0Jyl95dXYyDLjh9DR1mln/pub)
 - [Project Proposal](https://docs.google.com/document/d/1DTW47zXW2rzbVkHM4GLeFzOclJOMAuph4Z5-gXX5k5c/edit)
 - [Progress Report](https://docs.google.com/document/d/1nrmMg8YSDYFV3myOLY-BGLmvsR97cLks/edit)
+- [Figma](https://www.figma.com/file/nYpPRs4fq2G1JqgF8tUISJ/Welcome-to-FigJam?type=whiteboard&node-id=0-1)
 - [Project Team Tasks](https://docs.google.com/document/d/1n_YQuL9-CeGPTlXEqUlfWlNgd00ygJ2FoBVJS8xYR94/edit)
 - [Project Drive](https://drive.google.com/drive/folders/1tlR_83Kof5RTz8a66ZOJtygNr57252UU)
 - [DiffusionDB](https://github.com/poloclub/diffusiondb)
@@ -17,7 +18,7 @@ This repository contains code related to the final project of
         - **For Windows**:
             ```
             python -m venv venv
-            .\\venv\\Scripts\\activate
+            venv\Scripts\activate
             ```
         - **For Mac/Linux**:
             ```
