@@ -37,6 +37,35 @@ image_search_button = dcc.Upload(
 
 logo = html.Img(src="/assets/logo.png", style={"height": "50px", "margin-right": "10px", "padding-left": "20px"})
 
+prompt_insights = html.Div(
+    [html.H3("Prompt Insights", style={"margin-left": "10px", "font-size": "15px", "font-family": "Arial, sans-serif"})],
+    style={
+        "justify-content": "space-between",
+        "align-items": "center",
+        "width": "100%",
+        "height": "50px",
+        "margin": "10px 0",
+        "padding": "10px",
+        "border": "1px solid #808080",
+        "box-sizing": "border-box",
+        "border-radius": "10px",
+        "display": "flex",
+    },
+)
+
+insights = html.Div(
+    style={
+        "width": "100%",
+        "height": "calc(100vh - 120px)",
+        "margin": "10px 0",
+        "padding": "10px",
+        "border": "1px solid #808080",
+        "box-sizing": "border-box",
+        "border-radius": "10px",
+        "background-color": "#f2f2f2",
+    },
+)
+
 app.layout = html.Div(
     [
         html.Div(
@@ -52,24 +81,73 @@ app.layout = html.Div(
                 "border-radius": "10px",
             },
         ),
+
         html.Div(
-            [html.H3("Input Prompt", style={"margin-left": "10px", "font-size": "15px", "font-family": "Arial, sans-serif"}), text_search_bar, image_search_button],
+            [
+                html.Div(
+                    [html.H3("Input Prompt", style={"margin-left": "10px", "font-size": "15px", "font-family": "Arial, sans-serif"}), text_search_bar, image_search_button],
+                    style={
+                        "justify-content": "space-between",
+                        "align-items": "center",
+                        "width": "50%",
+                        "height": "50px",
+                        "margin": "10px 0",
+                        "padding": "10px",
+                        "border": "1px solid #808080",
+                        "box-sizing": "border-box",
+                        "border-radius": "10px",
+                        "display": "flex",
+                        "margin-right": "10px"
+                    },
+                ),
+                html.Div(
+                    [
+                        prompt_insights
+                    ],
+                    style={
+                        "display": "flex",
+                        "flex-direction": "column",
+                        "align-items": "flex-end",
+                        "width": "50%"
+                    }
+                )
+            ],
             style={
-                "justify-content": "space-between",
-                "align-items": "center",
-                "width": "50%",
-                "height": "50px",
-                "margin": "10px 0",
-                "padding": "10px",
-                "border": "1px solid #808080",
-                "box-sizing": "border-box",
-                "border-radius": "10px",
+               "display": "flex", 
+               "justify-content": "space-between",
+               "width": "100%"
+            }
+        ),
+
+        html.Div(
+            [
+        html.Div(
+            html.Div(id="search-results", style={"overflow": "auto", "height": "100vh", "width": "100%"}), 
+            style={
+                "width": "50%",  
+                "margin-right": "5px"
+            }
+        ),
+        html.Div(
+            [
+                insights
+            ],
+            style={
+                "width": "50%", 
+                "margin-left": "5px"
+            }
+                ),
+            ],
+            style={
                 "display": "flex",
+                "justify-content": "space-between",
             },
         ),
-        html.Div(id="search-results", style={"overflow": "auto", "height": "100vh"})
     ]
 )
+
+
+
  
 @app.callback(
     [
