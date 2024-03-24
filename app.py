@@ -25,7 +25,12 @@ text_search_bar = dcc.Input(
     type="text",
     placeholder="Enter search string here...",
     debounce=True,
-    style={"display": "flex", "text-align": "center", "margin": "auto", "width": "70%"},
+    style={
+        "display": "flex",
+        "text-align": "center",
+        "margin": "auto",
+        "width": "100%",
+    },
 )
 
 image_search_button = dcc.Upload(
@@ -35,12 +40,16 @@ image_search_button = dcc.Upload(
     style={"display": "flex", "width": "50px"},
 )
 
-logo = html.Img(src="/assets/logo.png", style={"height": "50px", "margin-right": "10px", "padding-left": "20px"})
 
 app.layout = html.Div(
     [
         html.Div(
-            [logo, html.H1("Crowdsource AI", style={"margin-left": "10px", "font-family": "Arial, sans-serif"})],
+            [
+                html.H1(
+                    "Prompt Explorer",
+                    style={"margin-left": "10px", "font-family": "Arial, sans-serif"},
+                )
+            ],
             style={
                 "display": "flex",
                 "align-items": "center",
@@ -53,11 +62,22 @@ app.layout = html.Div(
             },
         ),
         html.Div(
-            [html.H3("Input Prompt", style={"margin-left": "10px", "font-size": "15px", "font-family": "Arial, sans-serif"}), text_search_bar, image_search_button],
+            [
+                html.H3(
+                    "Input Prompt",
+                    style={
+                        "margin-left": "10px",
+                        "font-size": "15px",
+                        "font-family": "Arial, sans-serif",
+                    },
+                ),
+                text_search_bar,
+                image_search_button,
+            ],
             style={
                 "justify-content": "space-between",
                 "align-items": "center",
-                "width": "50%",
+                "width": "100%",
                 "height": "50px",
                 "margin": "10px 0",
                 "padding": "10px",
@@ -67,10 +87,11 @@ app.layout = html.Div(
                 "display": "flex",
             },
         ),
-        html.Div(id="search-results", style={"overflow": "auto", "height": "100vh"})
+        html.Div(id="search-results", style={"overflow": "auto", "height": "100vh"}),
     ]
 )
- 
+
+
 @app.callback(
     [
         Output("search-results", "children"),
