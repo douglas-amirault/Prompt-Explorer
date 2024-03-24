@@ -1,8 +1,10 @@
 from sklearn.feature_extraction.text import TfidfVectorizer
 from .image_processor import ImageProcessor
 import numpy as np
+from collections import Counter
 from tqdm import tqdm
 from PIL import Image
+from nltk import word_tokenize, pos_tag
 import os
 import joblib
 
@@ -38,6 +40,29 @@ class SearchEngine:
         joblib.dump(out, self.embs_loc)
         return out
 
+    def get_histogram_data(self, matching_results, num_adjs=8):
+        adjectives = [
+            word 
+            for prompt in [m["prompt"] for m in matching_results]
+            for word, tag in pos_tag(word_tokenize(prompt)) 
+            if tag.startswith("JJ")
+        ]
+        common_adjs = Counter(adjectives).most_common(num_adjs)
+        data = {
+            "x": [adj for adj, count in common_adjs],
+            "y": [count for adj, count in common_adjs],
+            "type": "bar"
+        }
+        histogram_data = {
+            "data": [data],
+            "layout": {
+                "title": "Most Common Adjectives",
+                "xaxis": {"title": "Adjective", "fixedrange": True},
+                "yaxis": {"title": "Count", "fixedrange": True}
+            }
+        }
+        return histogram_data
+
     def get_matching_results(self, query, threshold=0, max_results=10):
         vec = self.vectorizer.transform([query])
         search_res = self.dataset_tfidf.dot(vec.T)
@@ -46,7 +71,9 @@ class SearchEngine:
         out_inds = [
             x[0] for x in sorted(valid_results, reverse=True, key=lambda x: x[1])
         ]
-        return [self.items[ind] for ind in out_inds][:max_results]
+        matching_results = [self.items[ind] for ind in out_inds]
+        histogram_data = self.get_histogram_data(matching_results)
+        return matching_results[:max_results], histogram_data
 
     def search_for_image(self, image, threshold=25, max_results=10):
         image_embedding = self.image_processor.embed_images([image])
@@ -57,4 +84,6 @@ class SearchEngine:
         out_inds = [
             x[0] for x in sorted(valid_results, reverse=True, key=lambda x: x[1])
         ]
-        return [self.items[ind] for ind in out_inds][:max_results]
+        matching_results = [self.items[ind] for ind in out_inds]
+        histogram_data = self.get_histogram_data(matching_results)
+        return matching_results[:max_results], histogram_data
