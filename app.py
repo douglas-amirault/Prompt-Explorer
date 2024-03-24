@@ -1,5 +1,5 @@
 import dash
-from dash import dcc, html, Input, Output
+from dash import dcc, html, Input, Output, State
 from src.result_card import create_result_card
 from src.dataset import Dataset
 from src.search_engine import SearchEngine
@@ -146,18 +146,35 @@ app.layout = html.Div([
         Output("text-search", "value"),
         Output("upload-image", "contents"),
     ],
-    [Input("text-search", "value"), Input("upload-image", "contents")],
+    [
+        Input("text-search", "value"),
+        Input("upload-image", "contents"),
+        Input("histogram", "clickData")
+    ],
+    [
+        State("text-search", "value")
+    ]
 )
 
-def search(search_term, image):
-    if image:
+def search(search_term, image, click_data, current_search_term):
+    ctx = dash.callback_context
+    triggered_id = ctx.triggered[0]["prop_id"].split(".")[0] if ctx.triggered else ""
+
+    if triggered_id == "upload-image" and image:
         results_list, histogram_data = image_search(image)
         return results_list, histogram_data, "", ""
-    elif search_term:
+
+    elif triggered_id == "histogram" and click_data:
+        clicked_adjective = click_data["points"][0]["x"]
+        new_search_term = f"{current_search_term} {clicked_adjective}".strip()
+        results_list, histogram_data = text_search(new_search_term)
+        return results_list, histogram_data, new_search_term, ""
+
+    elif triggered_id == "text-search":
         results_list, histogram_data = text_search(search_term)
         return results_list, histogram_data, search_term, ""
-    else:
-        return [], blank_graph, "", ""
+
+    return [], blank_graph, "", ""
 
 
 def text_search(search_term):
