@@ -26,7 +26,12 @@ text_search_bar = dcc.Input(
     type="text",
     placeholder="Enter search string here...",
     debounce=True,
-    style={"display": "flex", "text-align": "center", "margin": "auto", "width": "70%"},
+    style={
+        "display": "flex",
+        "text-align": "center",
+        "margin": "auto",
+        "width": "100%",
+    },
 )
 
 image_search_button = dcc.Upload(
@@ -36,59 +41,44 @@ image_search_button = dcc.Upload(
     style={"display": "flex", "width": "50px"},
 )
 
-logo = html.Img(src="/assets/logo.png", style={"height": "50px", "margin-right": "10px", "padding-left": "20px"})
 
-prompt_insights = html.Div(
-    [html.H3("Prompt Analysis", style={"margin-left": "10px", "font-size": "15px", "font-family": "Arial, sans-serif"})],
-    style={
-        "justify-content": "space-between",
-        "align-items": "center",
-        "width": "100%",
-        "height": "50px",
-        "margin": "10px 0",
-        "padding": "10px",
-        "border": "1px solid #808080",
-        "box-sizing": "border-box",
-        "border-radius": "10px",
-        "display": "flex",
-    },
-)
-
-insights = html.Div(
-    [dcc.Graph(id="histogram")],
-    style={
-        "width": "100%",
-        "height": "calc(100vh - 120px)",
-        "margin": "10px 0",
-        "padding": "10px",
-        "border": "1px solid #808080",
-        "box-sizing": "border-box",
-        "border-radius": "10px",
-        "background-color": "#f2f2f2"
-    }
-)
-
-app.layout = html.Div([
-    html.Div(
-        [logo, html.H1("Crowdsource AI", style={"margin-left": "10px", "font-family": "Arial, sans-serif"})],
-        style={
-            "display": "flex",
-            "align-items": "center",
-            "width": "100%",
-            "height": "50px",
-            "background-color": "#ffd700",
-            "border": "2px solid #000",
-            "box-sizing": "border-box",
-            "border-radius": "10px",
-        },
-    ),
-    html.Div([
+app.layout = html.Div(
+    [
         html.Div(
-            [html.H3("Input Prompt", style={"margin-left": "10px", "font-size": "15px", "font-family": "Arial, sans-serif"}), text_search_bar, image_search_button],
+            [
+                html.H1(
+                    "Prompt Explorer",
+                    style={"margin-left": "10px", "font-family": "Arial, sans-serif"},
+                )
+            ],
+            style={
+                "display": "flex",
+                "align-items": "center",
+                "width": "100%",
+                "height": "50px",
+                "background-color": "#ffd700",
+                "border": "2px solid #000",
+                "box-sizing": "border-box",
+                "border-radius": "10px",
+            },
+        ),
+        html.Div(
+            [
+                html.H3(
+                    "Input Prompt",
+                    style={
+                        "margin-left": "10px",
+                        "font-size": "15px",
+                        "font-family": "Arial, sans-serif",
+                    },
+                ),
+                text_search_bar,
+                image_search_button,
+            ],
             style={
                 "justify-content": "space-between",
                 "align-items": "center",
-                "width": "50%",
+                "width": "100%",
                 "height": "50px",
                 "margin": "10px 0",
                 "padding": "10px",
@@ -99,45 +89,10 @@ app.layout = html.Div([
                 "margin-right": "10px"
             },
         ),
-        html.Div(
-            [prompt_insights],
-            style={
-                "display": "flex",
-                "flex-direction": "column",
-                "align-items": "flex-end",
-                "width": "50%"
-            }
-        )
-    ],
-        style={
-            "display": "flex", 
-            "justify-content": "space-between",
-            "width": "100%"
-        }
-    ),
+        html.Div(id="search-results", style={"overflow": "auto", "height": "100vh"}),
+    ]
+)
 
-    html.Div([
-        html.Div(
-            html.Div(id="search-results", style={"overflow": "auto", "height": "100vh", "width": "100%"}), 
-            style={
-                "width": "50%",  
-                "margin-right": "5px"
-            }
-        ),
-        html.Div(
-            [insights],
-            style={
-                "width": "50%", 
-                "margin-left": "5px"
-            }
-        ),
-    ],
-        style={
-            "display": "flex",
-            "justify-content": "space-between",
-        },
-    ),
-])
 
 @app.callback(
     [
