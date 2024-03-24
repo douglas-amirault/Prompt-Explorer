@@ -89,7 +89,13 @@ app.layout = html.Div(
                 "margin-right": "10px"
             },
         ),
-        html.Div(id="search-results", style={"overflow": "auto", "height": "100vh"}),
+        html.Div(
+            [
+                html.Div(id="search-results", style={"overflow": "auto", "height": "100vh"}),
+                dcc.Graph(id="histogram", figure=blank_graph)
+            ],
+            style={"display": "flex", "justify-content": "space-between"}
+        )
     ]
 )
 
@@ -134,7 +140,7 @@ def search(search_term, image, click_data, current_search_term):
 
 def text_search(search_term):
     if not search_term:
-        return []
+        return [], blank_graph
 
     # Filter data based on search term (case-insensitive)
     results, histogram_data = search_engine.get_matching_results(search_term)
