@@ -1,5 +1,5 @@
 import dash
-from dash import dcc, html, Input, Output
+from dash import dcc, html, Input, Output, State
 from src.result_card import create_result_card
 from src.dataset import Dataset
 from src.search_engine import SearchEngine
@@ -11,6 +11,7 @@ import re
 
 
 THIS_DIR = os.path.abspath(".")
+blank_graph = {"data": [{"x": [], "y": [], "type": "bar", "orientation": "h"}], "layout": {"xaxis": {"fixedrange": True}, "yaxis": {"fixedrange": True}}}
 
 print("LOADING DATASET...")
 dataset = Dataset("./dataset/examples.jsonl")
@@ -85,9 +86,22 @@ app.layout = html.Div(
                 "box-sizing": "border-box",
                 "border-radius": "10px",
                 "display": "flex",
+                "margin-right": "10px"
             },
         ),
-        html.Div(id="search-results", style={"overflow": "auto", "height": "100vh"}),
+        html.Div(
+            [
+                html.Div(id="search-results", style={"overflow": "auto", "width": "50%", "height": "100vh"}),
+                html.Div(
+                    [
+                        dcc.Graph(id="histogram-global", figure=dataset.adjs),
+                        dcc.Graph(id="histogram", figure=blank_graph)
+                    ],
+                    style={"display": "flex", "flex-direction": "column", "width": "50%"}
+                )
+            ],
+            style={"display": "flex", "justify-content": "space-between"}
+        )
     ]
 )
 
@@ -95,36 +109,61 @@ app.layout = html.Div(
 @app.callback(
     [
         Output("search-results", "children"),
+        Output("histogram", "figure"),
         Output("text-search", "value"),
         Output("upload-image", "contents"),
     ],
-    [Input("text-search", "value"), Input("upload-image", "contents")],
+    [
+        Input("text-search", "value"),
+        Input("upload-image", "contents"),
+        Input("histogram", "clickData"),
+        Input("histogram-global", "clickData")
+    ],
+    [
+        State("text-search", "value")
+    ]
 )
-def search(search_term, image):
-    if image:
-        return image_search(image), "", ""
-    elif search_term:
-        return text_search(search_term), search_term, ""
-    else:
-        return [], "", ""
+
+def search(search_term, image, click_data, click_data_global, current_search_term):
+    ctx = dash.callback_context
+    triggered_id = ctx.triggered[0]["prop_id"].split(".")[0] if ctx.triggered else ""
+
+    if triggered_id == "upload-image" and image:
+        results_list, histogram_data = image_search(image)
+        return results_list, histogram_data, "", ""
+
+    elif triggered_id in ["histogram", "histogram-global"] and (click_data or click_data_global):
+        if triggered_id == "histogram":
+            clicked_adjective = click_data["points"][0]["y"]
+        else:
+            clicked_adjective = click_data_global["points"][0]["y"]
+        new_search_term = f"{current_search_term} {clicked_adjective}".strip()
+        results_list, histogram_data = text_search(new_search_term)
+        return results_list, histogram_data, new_search_term, ""
+
+    elif triggered_id == "text-search":
+        results_list, histogram_data = text_search(search_term)
+        return results_list, histogram_data, search_term, ""
+
+    return [], blank_graph, "", ""
 
 
 def text_search(search_term):
     if not search_term:
-        return []
+        return [], blank_graph
 
     # Filter data based on search term (case-insensitive)
-    filtered_data = search_engine.get_matching_results(search_term)
+    results, histogram_data = search_engine.get_matching_results(search_term)
 
     # Display results
-    if len(filtered_data) == 0:
-        return "No results found."
+    if len(results) == 0:
+        return "No results found.", blank_graph
 
     results_list = [
         create_result_card(os.path.join(THIS_DIR, item["image"]), item["prompt"])
-        for item in filtered_data
+        for item in results
     ]
-    return results_list
+    return results_list, histogram_data
 
 
 def image_search(image):
@@ -133,17 +172,17 @@ def image_search(image):
     # Load as PIL image so we can embed it
     loaded_image = Image.open(io.BytesIO(base64.b64decode(image)))
     # Do image search
-    results = search_engine.search_for_image(loaded_image)
+    results, histogram_data = search_engine.search_for_image(loaded_image)
 
     if len(results) == 0:
-        return "No results found."
+        return "No results found.", blank_graph
 
     results_list = [
         create_result_card(os.path.join(THIS_DIR, item["image"]), item["prompt"])
         for item in results
     ]
 
-    return results_list
+    return results_list, histogram_data
 
 
 if __name__ == "__main__":

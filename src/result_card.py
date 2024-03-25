@@ -8,10 +8,10 @@ styles = {
         "border": "1px solid #808080",
         "padding": "10px",
         "margin": "10px 0",
-        "width": "48.7%",
+        "width": "95.7%",
         "border-radius": "10px",
-        "justify-content": "space-between"
-
+        "justify-content": "space-between",
+         "margin-right": "10px"
     },
     
     "result-image": {
