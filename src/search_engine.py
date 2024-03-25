@@ -49,16 +49,17 @@ class SearchEngine:
         ]
         common_adjs = Counter(adjectives).most_common(num_adjs)
         data = {
-            "x": [adj for adj, count in common_adjs],
-            "y": [count for adj, count in common_adjs],
-            "type": "bar"
+            "x": [count for adj, count in common_adjs][::-1],
+            "y": [adj for adj, count in common_adjs][::-1],
+            "type": "bar",
+            "orientation": "h"
         }
         histogram_data = {
             "data": [data],
             "layout": {
                 "title": "Most Common Adjectives",
-                "xaxis": {"title": "Adjective", "fixedrange": True},
-                "yaxis": {"title": "Count", "fixedrange": True}
+                "xaxis": {"title": "Count", "fixedrange": True},
+                "yaxis": {"fixedrange": True}
             }
         }
         return histogram_data

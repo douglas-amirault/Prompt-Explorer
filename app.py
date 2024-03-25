@@ -11,7 +11,7 @@ import re
 
 
 THIS_DIR = os.path.abspath(".")
-blank_graph = {"data": [{"x": [], "y": [], "type": "bar"}], "layout": {"xaxis": {"fixedrange": True}, "yaxis": {"fixedrange": True}}}
+blank_graph = {"data": [{"x": [], "y": [], "type": "bar", "orientation": "h"}], "layout": {"xaxis": {"fixedrange": True}, "yaxis": {"fixedrange": True}}}
 
 print("LOADING DATASET...")
 dataset = Dataset("./dataset/examples.jsonl")
@@ -91,8 +91,14 @@ app.layout = html.Div(
         ),
         html.Div(
             [
-                html.Div(id="search-results", style={"overflow": "auto", "height": "100vh"}),
-                dcc.Graph(id="histogram", figure=blank_graph)
+                html.Div(id="search-results", style={"overflow": "auto", "width": "50%", "height": "100vh"}),
+                html.Div(
+                    [
+                        dcc.Graph(id="histogram-global", figure=dataset.adjs),
+                        dcc.Graph(id="histogram", figure=blank_graph)
+                    ],
+                    style={"display": "flex", "flex-direction": "column", "width": "50%"}
+                )
             ],
             style={"display": "flex", "justify-content": "space-between"}
         )
@@ -110,14 +116,15 @@ app.layout = html.Div(
     [
         Input("text-search", "value"),
         Input("upload-image", "contents"),
-        Input("histogram", "clickData")
+        Input("histogram", "clickData"),
+        Input("histogram-global", "clickData")
     ],
     [
         State("text-search", "value")
     ]
 )
 
-def search(search_term, image, click_data, current_search_term):
+def search(search_term, image, click_data, click_data_global, current_search_term):
     ctx = dash.callback_context
     triggered_id = ctx.triggered[0]["prop_id"].split(".")[0] if ctx.triggered else ""
 
@@ -125,8 +132,11 @@ def search(search_term, image, click_data, current_search_term):
         results_list, histogram_data = image_search(image)
         return results_list, histogram_data, "", ""
 
-    elif triggered_id == "histogram" and click_data:
-        clicked_adjective = click_data["points"][0]["x"]
+    elif triggered_id in ["histogram", "histogram-global"] and (click_data or click_data_global):
+        if triggered_id == "histogram":
+            clicked_adjective = click_data["points"][0]["y"]
+        else:
+            clicked_adjective = click_data_global["points"][0]["y"]
         new_search_term = f"{current_search_term} {clicked_adjective}".strip()
         results_list, histogram_data = text_search(new_search_term)
         return results_list, histogram_data, new_search_term, ""
