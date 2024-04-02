@@ -16,6 +16,12 @@ class Dataset:
                 except:
                     break
         print(f"LOADED: {len(self.items)} EXAMPLES")
+        print("PREPROCESSING DATASET...")
+        for idx in tqdm(range(len(self.items))):
+            self.items[idx]["tagged"] = pos_tag(
+                word_tokenize(self.items[idx]["prompt"])
+            )
+        print("DONE")
         self.adjs = self.get_global_adjectives()
 
     def __iter__(self):
@@ -24,9 +30,9 @@ class Dataset:
 
     def get_global_adjectives(self, num_adjs=8):
         adjectives = [
-            word 
+            word
             for prompt in [m["prompt"] for m in self.items]
-            for word, tag in pos_tag(word_tokenize(prompt)) 
+            for word, tag in pos_tag(word_tokenize(prompt))
             if tag.startswith("JJ")
         ]
         common_adjs = Counter(adjectives).most_common(num_adjs)
@@ -34,14 +40,14 @@ class Dataset:
             "x": [count for adj, count in common_adjs][::-1],
             "y": [adj for adj, count in common_adjs][::-1],
             "type": "bar",
-            "orientation": "h"
+            "orientation": "h",
         }
         histogram_data = {
             "data": [data],
             "layout": {
                 "title": "Most Common Adjectives (Global)",
                 "xaxis": {"title": "Count", "fixedrange": True},
-                "yaxis": {"fixedrange": True}
-            }
+                "yaxis": {"fixedrange": True},
+            },
         }
         return histogram_data

@@ -11,7 +11,10 @@ import re
 
 
 THIS_DIR = os.path.abspath(".")
-blank_graph = {"data": [{"x": [], "y": [], "type": "bar", "orientation": "h"}], "layout": {"xaxis": {"fixedrange": True}, "yaxis": {"fixedrange": True}}}
+blank_graph = {
+    "data": [{"x": [], "y": [], "type": "bar", "orientation": "h"}],
+    "layout": {"xaxis": {"fixedrange": True}, "yaxis": {"fixedrange": True}},
+}
 
 print("LOADING DATASET...")
 dataset = Dataset("./dataset/examples.jsonl")
@@ -86,22 +89,29 @@ app.layout = html.Div(
                 "box-sizing": "border-box",
                 "border-radius": "10px",
                 "display": "flex",
-                "margin-right": "10px"
+                "margin-right": "10px",
             },
         ),
         html.Div(
             [
-                html.Div(id="search-results", style={"overflow": "auto", "width": "50%", "height": "100vh"}),
+                html.Div(
+                    id="search-results",
+                    style={"overflow": "auto", "width": "50%", "height": "100vh"},
+                ),
                 html.Div(
                     [
                         dcc.Graph(id="histogram-global", figure=dataset.adjs),
-                        dcc.Graph(id="histogram", figure=blank_graph)
+                        dcc.Graph(id="histogram", figure=blank_graph),
                     ],
-                    style={"display": "flex", "flex-direction": "column", "width": "50%"}
-                )
+                    style={
+                        "display": "flex",
+                        "flex-direction": "column",
+                        "width": "50%",
+                    },
+                ),
             ],
-            style={"display": "flex", "justify-content": "space-between"}
-        )
+            style={"display": "flex", "justify-content": "space-between"},
+        ),
     ]
 )
 
@@ -117,13 +127,10 @@ app.layout = html.Div(
         Input("text-search", "value"),
         Input("upload-image", "contents"),
         Input("histogram", "clickData"),
-        Input("histogram-global", "clickData")
+        Input("histogram-global", "clickData"),
     ],
-    [
-        State("text-search", "value")
-    ]
+    [State("text-search", "value")],
 )
-
 def search(search_term, image, click_data, click_data_global, current_search_term):
     ctx = dash.callback_context
     triggered_id = ctx.triggered[0]["prop_id"].split(".")[0] if ctx.triggered else ""
@@ -132,7 +139,9 @@ def search(search_term, image, click_data, click_data_global, current_search_ter
         results_list, histogram_data = image_search(image)
         return results_list, histogram_data, "", ""
 
-    elif triggered_id in ["histogram", "histogram-global"] and (click_data or click_data_global):
+    elif triggered_id in ["histogram", "histogram-global"] and (
+        click_data or click_data_global
+    ):
         if triggered_id == "histogram":
             clicked_adjective = click_data["points"][0]["y"]
         else:
