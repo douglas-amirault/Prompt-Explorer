@@ -1,4 +1,5 @@
 import json
+import re
 from tqdm import tqdm
 from collections import Counter
 from nltk import word_tokenize, pos_tag
@@ -12,7 +13,33 @@ class Dataset:
         with open("./dataset/examples.jsonl", "r") as json_file:
             for line in tqdm(json_file):
                 try:
-                    self.items.append(json.loads(line))
+                    item = json.loads(line)
+                    prompt_lower = item["prompt"].lower()
+                    if "8 k" in prompt_lower:
+                        item["prompt"] = item["prompt"].replace("8 k", "8K")
+                    if "4 k" in prompt_lower:
+                        item["prompt"] = item["prompt"].replace("4 k", "4K")
+                    if "3 d" in prompt_lower:
+                        item["prompt"] = item["prompt"].replace("3 d", "3D")
+                    if "1 6 k" in prompt_lower:
+                        item["prompt"] = item["prompt"].replace("1 6 k", "16K")
+                    if "2 d" in prompt_lower:
+                        item["prompt"] = item["prompt"].replace("2 d", "2D")
+                    if "3 2 k" in prompt_lower:
+                        item["prompt"] = item["prompt"].replace("3 2 k", "32K") 
+                    if "y 2 k" in prompt_lower:
+                        item["prompt"] = item["prompt"].replace("y 2 k", "Y2K") 
+
+                    item["prompt"] = re.sub(r'(\d) (\d) (\d) (\d)', r'\1\2\3\4', item["prompt"])
+                    item["prompt"] = re.sub(r'(\d) (\d) (\d)', r'\1\2\3', item["prompt"])
+                    item["prompt"] = re.sub(r'(\d) (\d)', r'\1\2', item["prompt"])
+                    
+                    item["prompt"] = re.sub(r'(\d) th', r'\1th', item["prompt"])
+                    item["prompt"] = re.sub(r'(\d) nd', r'\1nd', item["prompt"])
+                    item["prompt"] = re.sub(r'(\d) s', r'\1s', item["prompt"])
+                    item["prompt"] = re.sub(r'(\d) mm', r'\1mm', item["prompt"])
+
+                    self.items.append(item)
                 except:
                     break
         print(f"LOADED: {len(self.items)} EXAMPLES")
