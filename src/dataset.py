@@ -48,6 +48,8 @@ class Dataset:
                 "title": "Most Common Adjectives (Global)",
                 "xaxis": {"title": "Count", "fixedrange": True},
                 "yaxis": {"fixedrange": True},
+                "paper_bgcolor":'rgba(0,0,0,0)',
+                "plot_bgcolor":'rgba(0,0,0,0)', 
             },
         }
         return histogram_data
