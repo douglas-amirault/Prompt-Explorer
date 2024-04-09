@@ -15,20 +15,20 @@ class Dataset:
                 try:
                     item = json.loads(line)
                     prompt_lower = item["prompt"].lower()
-                    if "8 k" in prompt_lower:
-                        item["prompt"] = item["prompt"].replace("8 k", "8K")
-                    if "4 k" in prompt_lower:
-                        item["prompt"] = item["prompt"].replace("4 k", "4K")
-                    if "3 d" in prompt_lower:
-                        item["prompt"] = item["prompt"].replace("3 d", "3D")
-                    if "1 6 k" in prompt_lower:
-                        item["prompt"] = item["prompt"].replace("1 6 k", "16K")
-                    if "2 d" in prompt_lower:
-                        item["prompt"] = item["prompt"].replace("2 d", "2D")
-                    if "3 2 k" in prompt_lower:
-                        item["prompt"] = item["prompt"].replace("3 2 k", "32K") 
-                    if "y 2 k" in prompt_lower:
-                        item["prompt"] = item["prompt"].replace("y 2 k", "Y2K") 
+
+                    replacements = {
+                        "8 k": "8K",
+                        "4 k": "4K",
+                        "3 d": "3D",
+                        "1 6 k": "16K",
+                        "2 d": "2D",
+                        "3 2 k": "32K",
+                        "y 2 k": "Y2K"
+                    }
+
+                    for key, value in replacements.items():
+                        if key in prompt_lower:
+                            item["prompt"] = item["prompt"].replace(key, value)
 
                     item["prompt"] = re.sub(r'(\d) (\d) (\d) (\d)', r'\1\2\3\4', item["prompt"])
                     item["prompt"] = re.sub(r'(\d) (\d) (\d)', r'\1\2\3', item["prompt"])
