@@ -64,7 +64,7 @@ class SearchEngine:
         }
         return histogram_data
 
-    def get_matching_results(self, query, threshold=0, max_results=10):
+    def get_matching_results(self, query, threshold=0):
         vec = self.vectorizer.transform([query])
         search_res = self.dataset_tfidf.dot(vec.T)
         scores = search_res[:, 0].toarray().flatten()
@@ -74,7 +74,7 @@ class SearchEngine:
         ]
         matching_results = [self.items[ind] for ind in out_inds]
         histogram_data = self.get_histogram_data(matching_results)
-        return matching_results[:max_results], histogram_data
+        return matching_results, histogram_data
 
     def search_for_image(self, image, threshold=25, max_results=10):
         image_embedding = self.image_processor.embed_images([image])
@@ -87,4 +87,4 @@ class SearchEngine:
         ]
         matching_results = [self.items[ind] for ind in out_inds]
         histogram_data = self.get_histogram_data(matching_results)
-        return matching_results[:max_results], histogram_data
+        return matching_results, histogram_data
