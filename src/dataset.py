@@ -72,7 +72,16 @@ class Dataset:
         histogram_data = {
             "data": [data],
             "layout": {
-                "title": "Most Common Adjectives (Global)",
+                "title": {
+                    "text": "Most Common Adjectives (Global)",
+                    "x": 0.5,
+                    "xanchor": "center",
+                    "yanchor": "top",
+                },
+                "margin": {
+                    "t": 45,
+                    "b": 45,
+                },
                 "xaxis": {"title": "Count", "fixedrange": True},
                 "yaxis": {"fixedrange": True},
                 "paper_bgcolor":'rgba(0,0,0,0)',
