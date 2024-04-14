@@ -14,7 +14,10 @@ import json
 max_results = 10
 
 THIS_DIR = os.path.abspath(".")
-blank_graph = {"data": [{"x": [], "y": [], "type": "bar", "orientation": "h"}], "layout": {"xaxis": {"fixedrange": True}, "yaxis": {"fixedrange": True}}}
+blank_graph = {
+    "data": [{"x": [], "y": [], "type": "bar", "orientation": "h"}],
+    "layout": {"xaxis": {"fixedrange": True}, "yaxis": {"fixedrange": True}},
+}
 
 print("LOADING DATASET...")
 dataset = Dataset("./dataset/examples.jsonl")
@@ -91,23 +94,30 @@ app.layout = html.Div(
                 "box-sizing": "border-box",
                 "border-radius": "10px",
                 "display": "flex",
-                "margin-right": "10px"
+                "margin-right": "10px",
             },
         ),
         html.Div(
             [
-                html.Div(id="search-results", style={"overflow": "auto", "width": "50%", "height": "100vh"}),
+                html.Div(
+                    id="search-results",
+                    style={"overflow": "auto", "width": "50%", "height": "100vh"},
+                ),
                 html.Div(
                     [
                         html.Div(id="filters-container", style={"margin": "20px"}),
                         dcc.Graph(id="histogram-global", figure=dataset.adjs),
-                        dcc.Graph(id="histogram", figure=blank_graph)
+                        dcc.Graph(id="histogram", figure=blank_graph),
                     ],
-                    style={"display": "flex", "flex-direction": "column", "width": "50%"}
-                )
+                    style={
+                        "display": "flex",
+                        "flex-direction": "column",
+                        "width": "50%",
+                    },
+                ),
             ],
-            style={"display": "flex", "justify-content": "space-between"}
-        )
+            style={"display": "flex", "justify-content": "space-between"},
+        ),
     ]
 )
 
@@ -126,14 +136,11 @@ app.layout = html.Div(
         Input("upload-image", "contents"),
         Input("histogram", "clickData"),
         Input("histogram-global", "clickData"),
-        Input({"type": "remove-filter", "adjective": ALL}, "n_clicks")
+        Input({"type": "remove-filter", "adjective": ALL}, "n_clicks"),
     ],
-    [
-        State("current-results-store", "data"),
-        State("selected-adjectives-store", "data")
-    ]
+    [State("current-results-store", "data"),
+        State("selected-adjectives-store", "data")],
 )
-
 
 def search(
     search_term,
@@ -188,7 +195,9 @@ def search(
         return (result_cards, histogram_data, search_term, filtered_results, updated_adjectives, None)
 
     # HISTOGRAM AND FILTER CLICK LOGIC
-    elif triggered_id in ["histogram", "histogram-global"] and (click_data or click_data_global):
+    elif triggered_id in ["histogram", "histogram-global"] and (
+        click_data or click_data_global
+    ):
         clicked_adjective = (
             click_data["points"][0]["y"]
             if triggered_id == "histogram"

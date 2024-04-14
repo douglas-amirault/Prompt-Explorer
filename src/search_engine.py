@@ -42,9 +42,9 @@ class SearchEngine:
 
     def get_histogram_data(self, matching_results, num_adjs=8):
         adjectives = [
-            word 
-            for prompt in [m["prompt"] for m in matching_results]
-            for word, tag in pos_tag(word_tokenize(prompt)) 
+            word
+            for result in [m for m in matching_results]
+            for word, tag in result["tagged"]
             if tag.startswith("JJ")
         ]
         common_adjs = Counter(adjectives).most_common(num_adjs)
@@ -52,15 +52,15 @@ class SearchEngine:
             "x": [count for adj, count in common_adjs][::-1],
             "y": [adj for adj, count in common_adjs][::-1],
             "type": "bar",
-            "orientation": "h"
+            "orientation": "h",
         }
         histogram_data = {
             "data": [data],
             "layout": {
                 "title": "Most Common Adjectives",
                 "xaxis": {"title": "Count", "fixedrange": True},
-                "yaxis": {"fixedrange": True}
-            }
+                "yaxis": {"fixedrange": True},
+            },
         }
         return histogram_data
 
