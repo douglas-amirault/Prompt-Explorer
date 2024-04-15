@@ -87,6 +87,6 @@ class SearchEngine:
             x[0] for x in sorted(valid_results, reverse=True, key=lambda x: x[1])
         ]
         matching_results = [self.items[ind] for ind in out_inds]
-        filtered_results = [result for result in matching_results if all(adjective in result["prompt"] for adjective in selected_adjectives)]
+        filtered_results = [result for result in matching_results if len(selected_adjectives)==0 or all(adjective in result["prompt"] for adjective in selected_adjectives)]
         histogram_data = self.get_histogram_data(filtered_results)
         return filtered_results[:max_results], histogram_data
