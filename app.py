@@ -1,5 +1,5 @@
 import dash
-from dash import dcc, html, Input, Output, State
+from dash import dcc, html, Input, Output, State, ALL
 from src.result_card import create_result_card
 from src.dataset import Dataset
 from src.search_engine import SearchEngine
@@ -8,7 +8,7 @@ import os
 import io
 import base64
 import re
-
+import json
 
 THIS_DIR = os.path.abspath(".")
 blank_graph = {
@@ -52,6 +52,8 @@ image_search_button = dcc.Upload(
 
 app.layout = html.Div(
     [
+        dcc.Store(id="selected-adjectives-store", data=[]),
+        dcc.Store(id="last-search-type", data=""),
         html.Div(
             [
                 html.H1(
@@ -105,6 +107,7 @@ app.layout = html.Div(
                 ),
                 html.Div(
                     [
+                        html.Div(id="filters-container", style={"margin": "20px"}),
                         dcc.Graph(id="histogram-global", figure=dataset.adjs),
                         dcc.Graph(id="histogram", figure=blank_graph),
                     ],
@@ -131,76 +134,167 @@ app.layout = html.Div(
         Output("histogram", "figure"),
         Output("text-search", "value"),
         Output("upload-image", "contents"),
+        Output("selected-adjectives-store", "data"),
+        Output("last-search-type", "data")
     ],
     [
         Input("text-search", "value"),
         Input("upload-image", "contents"),
         Input("histogram", "clickData"),
         Input("histogram-global", "clickData"),
+        Input({"type": "remove-filter", "adjective": ALL}, "n_clicks"),
     ],
-    [State("text-search", "value")],
+    [
+        State("selected-adjectives-store", "data"),
+        State("last-search-type", "data")
+    ]
 )
-def search(search_term, image, click_data, click_data_global, current_search_term):
+
+def search(
+    query,
+    image,
+    click_data,
+    click_data_global,
+    _,
+    selected_adjectives,
+    last_search_type
+):
     ctx = dash.callback_context
-    triggered_id = ctx.triggered[0]["prop_id"].split(".")[0] if ctx.triggered else ""
+    triggered_id, triggered_prop_id = ctx.triggered[0]["prop_id"].split(".") if ctx.triggered else ("", "")
 
+    # IMAGE UPLOAD LOGIC
     if triggered_id == "upload-image" and image:
-        results_list, histogram_data = image_search(image)
-        return results_list, histogram_data, "", ""
+        # when running new image search, clear current filters
+        result_cards, histogram_data = image_search(image, [])
+        return result_cards, histogram_data, "", image, [], "image"
+    
+    # TEXT SEARCH LOGIC
+    elif triggered_id == "text-search":
+        # when running new text search, clear current filters
+        result_cards, histogram_data = text_search(query, [])
+        return result_cards, histogram_data, query, "", [], "text"
 
+    # HANDLE REMOVAL OF FILTERS
+    elif "remove-filter" in triggered_id:
+        # ID adjective to be remove, update list of selected adjectives
+        adj_to_remove = json.loads(triggered_id)["adjective"]
+        selected_adjectives.remove(adj_to_remove)
+
+        if last_search_type == "text":
+            result_cards, histogram_data = text_search(query, selected_adjectives)
+            return result_cards, histogram_data, query, "", selected_adjectives, last_search_type
+        elif last_search_type == "image":
+            result_cards, histogram_data = image_search(image, selected_adjectives)
+            return result_cards, histogram_data, "", image, selected_adjectives, last_search_type
+
+    # HISTOGRAM AND FILTER CLICK LOGIC
     elif triggered_id in ["histogram", "histogram-global"] and (
         click_data or click_data_global
     ):
-        if triggered_id == "histogram":
-            clicked_adjective = click_data["points"][0]["y"]
-        else:
-            clicked_adjective = click_data_global["points"][0]["y"]
-        new_search_term = f"{current_search_term} {clicked_adjective}".strip()
-        results_list, histogram_data = text_search(new_search_term)
-        return results_list, histogram_data, new_search_term, ""
+        clicked_adjective = (
+            click_data["points"][0]["y"]
+            if triggered_id == "histogram"
+            else click_data_global["points"][0]["y"]
+        )
+        if clicked_adjective not in selected_adjectives:
+            selected_adjectives.append(clicked_adjective)
 
-    elif triggered_id == "text-search":
-        results_list, histogram_data = text_search(search_term)
-        return results_list, histogram_data, search_term, ""
+        if last_search_type == "text":
+            result_cards, histogram_data = text_search(query, selected_adjectives)
+            return result_cards, histogram_data, query, "", selected_adjectives, last_search_type
+        elif last_search_type == "image":
+            result_cards, histogram_data = image_search(image, selected_adjectives)
+            return result_cards, histogram_data, "", image, selected_adjectives, last_search_type
 
-    return [], blank_graph, "", ""
+    # NULL CASE
+    return [], blank_graph, "", "", [], ""
 
 
-def text_search(search_term):
-    if not search_term:
+def text_search(query, selected_adjectives):
+    if not query:
         return [], blank_graph
 
     # Filter data based on search term (case-insensitive)
-    results, histogram_data = search_engine.get_matching_results(search_term)
+    results, histogram_data = search_engine.get_matching_results(query, selected_adjectives)
 
     # Display results
     if len(results) == 0:
         return "No results found.", blank_graph
 
-    results_list = [
+    result_cards = [
         create_result_card(os.path.join(THIS_DIR, item["image"]), item["prompt"])
         for item in results
     ]
-    return results_list, histogram_data
+    return result_cards, histogram_data
 
 
-def image_search(image):
+def image_search(image, selected_adjectives):
     # Cleanup tags before base64 data
     image = re.sub("^data:image/.+;base64,", "", image)
     # Load as PIL image so we can embed it
     loaded_image = Image.open(io.BytesIO(base64.b64decode(image)))
     # Do image search
-    results, histogram_data = search_engine.search_for_image(loaded_image)
+    results, histogram_data = search_engine.search_for_image(loaded_image, selected_adjectives)
 
     if len(results) == 0:
         return "No results found.", blank_graph
 
-    results_list = [
+    result_cards = [
         create_result_card(os.path.join(THIS_DIR, item["image"]), item["prompt"])
         for item in results
     ]
 
-    return results_list, histogram_data
+    return result_cards, histogram_data
+
+
+@app.callback(
+        Output("filters-container", "children"),
+        [Input("selected-adjectives-store", "data")]
+)
+def update_display(store_data):
+    # Check if store_data is not empty
+    if store_data:
+        # Create a div for each filter
+        return html.Div(
+            [
+                html.Div(
+                    [
+                        html.Span(adjective),
+                        html.Button(
+                            "X", id={"type": "remove-filter", "adjective": adjective}
+                        ),
+                    ],
+                    style={
+                        "display": "flex",
+                        "align-items": "center",
+                        "margin": "5px",
+                        "padding": "5px 10px",  # Add padding inside the box
+                        "font-family": "Arial, sans-serif",
+                        "background-color": "#f0f0f0",  # Light grey background
+                        "border-radius": "15px"  # Rounded edges
+                        #"box-shadow": "0 2px 4px rgba(0,0,0,0.1)",  # Optional: add a subtle shadow for depth
+                    },
+                )
+                for idx, adjective in enumerate(store_data)
+            ],
+            style={
+                "display": "flex",
+                "justify-content": "center",
+                "flex-direction": "row",
+                "align-items": "left",
+            },
+        )
+    else:
+        # Return a message indicating no filters selected
+        return html.Div(
+            "No filters selected",
+            style={
+                "margin": "20px",
+                "color": "#777",
+                "font-family": "Arial, sans-serif",
+                "text-align": "center"
+            },
+        )
 
 
 if __name__ == "__main__":

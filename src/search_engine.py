@@ -66,7 +66,7 @@ class SearchEngine:
         }
         return histogram_data
 
-    def get_matching_results(self, query, threshold=0, max_results=10):
+    def get_matching_results(self, query, selected_adjectives=[], threshold=0, max_results=10):
         vec = self.vectorizer.transform([query])
         search_res = self.dataset_tfidf.dot(vec.T)
         scores = search_res[:, 0].toarray().flatten()
@@ -75,10 +75,11 @@ class SearchEngine:
             x[0] for x in sorted(valid_results, reverse=True, key=lambda x: x[1])
         ]
         matching_results = [self.items[ind] for ind in out_inds]
-        histogram_data = self.get_histogram_data(matching_results)
-        return matching_results[:max_results], histogram_data
+        filtered_results = [result for result in matching_results if len(selected_adjectives==0) or all(adjective in result["prompt"] for adjective in selected_adjectives)]
+        histogram_data = self.get_histogram_data(filtered_results)
+        return filtered_results[:max_results], histogram_data
 
-    def search_for_image(self, image, threshold=25, max_results=10):
+    def search_for_image(self, image, selected_adjectives=[], threshold=25, max_results=10):
         image_embedding = self.image_processor.embed_images([image])
         dot_products = np.dot(image_embedding, self.image_embeddings.T).flatten()
         valid_results = [
@@ -88,5 +89,6 @@ class SearchEngine:
             x[0] for x in sorted(valid_results, reverse=True, key=lambda x: x[1])
         ]
         matching_results = [self.items[ind] for ind in out_inds]
-        histogram_data = self.get_histogram_data(matching_results)
-        return matching_results[:max_results], histogram_data
+        filtered_results = [result for result in matching_results if len(selected_adjectives)==0 or all(adjective in result["prompt"] for adjective in selected_adjectives)]
+        histogram_data = self.get_histogram_data(filtered_results)
+        return filtered_results[:max_results], histogram_data
