@@ -13,7 +13,12 @@ import re
 THIS_DIR = os.path.abspath(".")
 blank_graph = {
     "data": [{"x": [], "y": [], "type": "bar", "orientation": "h"}],
-    "layout": {"xaxis": {"fixedrange": True}, "yaxis": {"fixedrange": True}},
+    "layout": {
+        "xaxis": {"fixedrange": True}, 
+        "yaxis": {"fixedrange": True},
+        "paper_bgcolor":'rgba(0,0,0,0)',
+        "plot_bgcolor":'rgba(0,0,0,0)', 
+    },
 }
 
 print("LOADING DATASET...")
@@ -107,6 +112,10 @@ app.layout = html.Div(
                         "display": "flex",
                         "flex-direction": "column",
                         "width": "50%",
+                        "margin": "10px 0",
+                        "border": "1px solid #808080",
+                        "background-color": "#f2f2f2",
+                        "border-radius": "10px",
                     },
                 ),
             ],
