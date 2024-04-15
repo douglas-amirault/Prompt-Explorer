@@ -169,13 +169,13 @@ def search(
     if triggered_id == "upload-image" and image:
         # when running new image search, clear current filters
         result_cards, histogram_data, cloud = image_search(image, [])
-        return result_cards, histogram_data, "", image, [], "image"
+        return result_cards, histogram_data, cloud, "", image, [], "image"
     
     # TEXT SEARCH LOGIC
     elif triggered_id == "text-search":
         # when running new text search, clear current filters
-        result_cards, histogram_data = text_search(query, [])
-        return result_cards, histogram_data, query, "", [], "text"
+        result_cards, histogram_data, cloud = text_search(query, [])
+        return result_cards, histogram_data, cloud, query, "", [], "text"
 
     # HANDLE REMOVAL OF FILTERS
     elif "remove-filter" in triggered_id:
@@ -184,11 +184,11 @@ def search(
         selected_adjectives.remove(adj_to_remove)
 
         if last_search_type == "text":
-            result_cards, histogram_data = text_search(query, selected_adjectives)
-            return result_cards, histogram_data, query, "", selected_adjectives, last_search_type
+            result_cards, histogram_data, cloud = text_search(query, selected_adjectives)
+            return result_cards, histogram_data, cloud, query, "", selected_adjectives, last_search_type
         elif last_search_type == "image":
-            result_cards, histogram_data = image_search(image, selected_adjectives)
-            return result_cards, histogram_data, "", image, selected_adjectives, last_search_type
+            result_cards, histogram_data, cloud = image_search(image, selected_adjectives)
+            return result_cards, histogram_data, cloud, "", image, selected_adjectives, last_search_type
 
     # HISTOGRAM AND FILTER CLICK LOGIC
     elif triggered_id in ["histogram", "histogram-global"] and (
@@ -218,7 +218,7 @@ def text_search(query, selected_adjectives):
         return [], blank_graph
 
     # Filter data based on search term (case-insensitive)
-    results, histogram_data = search_engine.get_matching_results(query, selected_adjectives)
+    results, histogram_data, cloud = search_engine.get_matching_results(query, selected_adjectives)
 
     # Display results
     if len(results) == 0:
