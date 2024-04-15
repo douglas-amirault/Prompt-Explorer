@@ -1,4 +1,5 @@
 import json
+import re
 from tqdm import tqdm
 from collections import Counter
 from nltk import word_tokenize, pos_tag
@@ -12,7 +13,33 @@ class Dataset:
         with open("./dataset/examples.jsonl", "r") as json_file:
             for line in tqdm(json_file):
                 try:
-                    self.items.append(json.loads(line))
+                    item = json.loads(line)
+                    prompt_lower = item["prompt"].lower()
+
+                    replacements = {
+                        "8 k": "8K",
+                        "4 k": "4K",
+                        "3 d": "3D",
+                        "1 6 k": "16K",
+                        "2 d": "2D",
+                        "3 2 k": "32K",
+                        "y 2 k": "Y2K"
+                    }
+
+                    for key, value in replacements.items():
+                        if key in prompt_lower:
+                            item["prompt"] = item["prompt"].replace(key, value)
+
+                    item["prompt"] = re.sub(r'(\d) (\d) (\d) (\d)', r'\1\2\3\4', item["prompt"])
+                    item["prompt"] = re.sub(r'(\d) (\d) (\d)', r'\1\2\3', item["prompt"])
+                    item["prompt"] = re.sub(r'(\d) (\d)', r'\1\2', item["prompt"])
+                    
+                    item["prompt"] = re.sub(r'(\d) th', r'\1th', item["prompt"])
+                    item["prompt"] = re.sub(r'(\d) nd', r'\1nd', item["prompt"])
+                    item["prompt"] = re.sub(r'(\d) s', r'\1s', item["prompt"])
+                    item["prompt"] = re.sub(r'(\d) mm', r'\1mm', item["prompt"])
+
+                    self.items.append(item)
                 except:
                     break
         print(f"LOADED: {len(self.items)} EXAMPLES")
