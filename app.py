@@ -108,12 +108,14 @@ app.layout = html.Div(
                 html.Div(
                     [
                         html.Div(id="filters-container", style={"margin": "20px"}),
-                        dcc.Graph(id="histogram-global", figure=dataset.adjs),
-                        dcc.Graph(id="histogram", figure=blank_graph),
+                        dcc.Graph(id="histogram-global", figure=dataset.adjs, style={'height': '350px', 'width': '100%'}),
+                        dcc.Graph(id="histogram", figure=blank_graph, style={'height': '405px', 'width': '100%'}),
+                        html.Img(id="word-cloud-image", style={"width": "50%", "height": "auto", "object-fit": "contain"})
                     ],
                     style={
                         "display": "flex",
                         "flex-direction": "column",
+                        "align-items": "center",
                         "width": "50%",
                         "margin": "10px 0",
                         "border": "1px solid #808080",
@@ -132,6 +134,7 @@ app.layout = html.Div(
     [
         Output("search-results", "children"),
         Output("histogram", "figure"),
+        Output("word-cloud-image", "src"),
         Output("text-search", "value"),
         Output("upload-image", "contents"),
         Output("selected-adjectives-store", "data"),
@@ -165,14 +168,14 @@ def search(
     # IMAGE UPLOAD LOGIC
     if triggered_id == "upload-image" and image:
         # when running new image search, clear current filters
-        result_cards, histogram_data = image_search(image, [])
-        return result_cards, histogram_data, "", image, [], "image"
+        result_cards, histogram_data, cloud = image_search(image, [])
+        return result_cards, histogram_data, cloud, "", image, [], "image"
     
     # TEXT SEARCH LOGIC
     elif triggered_id == "text-search":
         # when running new text search, clear current filters
-        result_cards, histogram_data = text_search(query, [])
-        return result_cards, histogram_data, query, "", [], "text"
+        result_cards, histogram_data, cloud = text_search(query, [])
+        return result_cards, histogram_data, cloud, query, "", [], "text"
 
     # HANDLE REMOVAL OF FILTERS
     elif "remove-filter" in triggered_id:
@@ -181,11 +184,11 @@ def search(
         selected_adjectives.remove(adj_to_remove)
 
         if last_search_type == "text":
-            result_cards, histogram_data = text_search(query, selected_adjectives)
-            return result_cards, histogram_data, query, "", selected_adjectives, last_search_type
+            result_cards, histogram_data, cloud = text_search(query, selected_adjectives)
+            return result_cards, histogram_data, cloud, query, "", selected_adjectives, last_search_type
         elif last_search_type == "image":
-            result_cards, histogram_data = image_search(image, selected_adjectives)
-            return result_cards, histogram_data, "", image, selected_adjectives, last_search_type
+            result_cards, histogram_data, cloud = image_search(image, selected_adjectives)
+            return result_cards, histogram_data, cloud, "", image, selected_adjectives, last_search_type
 
     # HISTOGRAM AND FILTER CLICK LOGIC
     elif triggered_id in ["histogram", "histogram-global"] and (
@@ -200,14 +203,14 @@ def search(
             selected_adjectives.append(clicked_adjective)
 
         if last_search_type == "text":
-            result_cards, histogram_data = text_search(query, selected_adjectives)
-            return result_cards, histogram_data, query, "", selected_adjectives, last_search_type
+            result_cards, histogram_data, cloud = text_search(query, selected_adjectives)
+            return result_cards, histogram_data, cloud, query, "", selected_adjectives, last_search_type
         elif last_search_type == "image":
-            result_cards, histogram_data = image_search(image, selected_adjectives)
-            return result_cards, histogram_data, "", image, selected_adjectives, last_search_type
+            result_cards, histogram_data, cloud = image_search(image, selected_adjectives)
+            return result_cards, histogram_data, cloud, "", image, selected_adjectives, last_search_type
 
     # NULL CASE
-    return [], blank_graph, "", "", [], ""
+    return [], blank_graph, "data:image/png;base64,", "", "", [], ""
 
 
 def text_search(query, selected_adjectives):
@@ -215,17 +218,17 @@ def text_search(query, selected_adjectives):
         return [], blank_graph
 
     # Filter data based on search term (case-insensitive)
-    results, histogram_data = search_engine.get_matching_results(query, selected_adjectives)
+    results, histogram_data, cloud = search_engine.get_matching_results(query, selected_adjectives)
 
     # Display results
     if len(results) == 0:
-        return "No results found.", blank_graph
+        return "No results found.", blank_graph, "data:image/png;base64,"
 
     result_cards = [
         create_result_card(os.path.join(THIS_DIR, item["image"]), item["prompt"])
         for item in results
     ]
-    return result_cards, histogram_data
+    return result_cards, histogram_data, cloud
 
 
 def image_search(image, selected_adjectives):
@@ -234,17 +237,17 @@ def image_search(image, selected_adjectives):
     # Load as PIL image so we can embed it
     loaded_image = Image.open(io.BytesIO(base64.b64decode(image)))
     # Do image search
-    results, histogram_data = search_engine.search_for_image(loaded_image, selected_adjectives)
+    results, histogram_data, cloud = search_engine.search_for_image(loaded_image, selected_adjectives)
 
     if len(results) == 0:
-        return "No results found.", blank_graph
+        return "No results found.", blank_graph, "data:image/png;base64,"
 
     result_cards = [
         create_result_card(os.path.join(THIS_DIR, item["image"]), item["prompt"])
         for item in results
     ]
 
-    return result_cards, histogram_data
+    return result_cards, histogram_data, cloud
 
 
 @app.callback(

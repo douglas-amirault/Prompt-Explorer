@@ -11,3 +11,4 @@ torchvision
 tqdm
 transformers
 nltk
+wordcloud
