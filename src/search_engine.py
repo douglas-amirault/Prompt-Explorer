@@ -64,7 +64,7 @@ class SearchEngine:
         }
         return histogram_data
 
-    def get_matching_results(self, query, selected_adjectives, threshold=0, max_results=10):
+    def get_matching_results(self, query, selected_adjectives=[], threshold=0, max_results=10):
         vec = self.vectorizer.transform([query])
         search_res = self.dataset_tfidf.dot(vec.T)
         scores = search_res[:, 0].toarray().flatten()
