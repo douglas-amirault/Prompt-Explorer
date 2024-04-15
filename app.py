@@ -1,6 +1,5 @@
 import dash
 from dash import dcc, html, Input, Output, State, ALL
-from dash.exceptions import PreventUpdate
 from src.result_card import create_result_card
 from src.dataset import Dataset
 from src.search_engine import SearchEngine
@@ -10,8 +9,6 @@ import io
 import base64
 import re
 import json
-
-max_results = 10
 
 THIS_DIR = os.path.abspath(".")
 blank_graph = {
@@ -50,8 +47,8 @@ image_search_button = dcc.Upload(
 
 app.layout = html.Div(
     [
-        dcc.Store(id='current-results-store'),
-        dcc.Store(id='selected-adjectives-store', data=[]),
+        dcc.Store(id="selected-adjectives-store", data=[]),
+        dcc.Store(id="last-search-type", data=""),
         html.Div(
             [
                 html.H1(
@@ -127,9 +124,9 @@ app.layout = html.Div(
         Output("search-results", "children"),
         Output("histogram", "figure"),
         Output("text-search", "value"),
-        Output("current-results-store", "data"),
+        Output("upload-image", "contents"),
         Output("selected-adjectives-store", "data"),
-        Output("upload-image", "contents")
+        Output("last-search-type", "data")
     ],
     [
         Input("text-search", "value"),
@@ -138,61 +135,48 @@ app.layout = html.Div(
         Input("histogram-global", "clickData"),
         Input({"type": "remove-filter", "adjective": ALL}, "n_clicks"),
     ],
-    [State("current-results-store", "data"),
-        State("selected-adjectives-store", "data")],
+    [
+        State("selected-adjectives-store", "data"),
+        State("last-search-type", "data")
+    ]
 )
 
 def search(
-    search_term,
+    query,
     image,
     click_data,
     click_data_global,
     _,
-    current_results,
     selected_adjectives,
+    last_search_type
 ):
     ctx = dash.callback_context
     triggered_id, triggered_prop_id = ctx.triggered[0]["prop_id"].split(".") if ctx.triggered else ("", "")
 
     # IMAGE UPLOAD LOGIC
     if triggered_id == "upload-image" and image:
-        results, result_cards, histogram_data = image_search(image)
-        return result_cards, histogram_data, "", results, [], ""
+        # when running new image search, clear current filters
+        result_cards, histogram_data = image_search(image, [])
+        return result_cards, histogram_data, "", image, [], "image"
+    
+    # TEXT SEARCH LOGIC
+    elif triggered_id == "text-search":
+        # when running new text search, clear current filters
+        result_cards, histogram_data = text_search(query, [])
+        return result_cards, histogram_data, query, "", [], "text"
 
     # HANDLE REMOVAL OF FILTERS
     elif "remove-filter" in triggered_id:
-
         # ID adjective to be remove, update list of selected adjectives
-        adj_to_remove = json.loads(triggered_id)['adjective']
-        updated_adjectives = [
-            adj for adj in selected_adjectives if adj != adj_to_remove
-        ]
+        adj_to_remove = json.loads(triggered_id)["adjective"]
+        selected_adjectives.remove(adj_to_remove)
 
-        # Instead of caching results, it will easier for our purposes to just rerun the search
-        current_results, _, _ = text_search(search_term)
-
-        # Update the current_results
-        if not updated_adjectives:  # Checks if updated_adjectives list is empty
-            filtered_results = current_results
-        else:
-            filtered_results = [
-                result
-                for result in current_results
-                if any(adj in result["prompt"] for adj in updated_adjectives)
-            ]
-
-
-        # Filtered result cards
-        result_cards = [
-            create_result_card(os.path.join(THIS_DIR, item["image"]), item["prompt"])
-            for item in filtered_results[:max_results]
-        ]
-
-        # Filtered histogram data
-        histogram_data = search_engine.get_histogram_data(filtered_results)
-
-        # Return updated state
-        return (result_cards, histogram_data, search_term, filtered_results, updated_adjectives, None)
+        if last_search_type == "text":
+            result_cards, histogram_data = text_search(query, selected_adjectives)
+            return result_cards, histogram_data, query, "", selected_adjectives, last_search_type
+        elif last_search_type == "image":
+            result_cards, histogram_data = image_search(image, selected_adjectives)
+            return result_cards, histogram_data, "", image, selected_adjectives, last_search_type
 
     # HISTOGRAM AND FILTER CLICK LOGIC
     elif triggered_id in ["histogram", "histogram-global"] and (
@@ -205,64 +189,58 @@ def search(
         )
         if clicked_adjective not in selected_adjectives:
             selected_adjectives.append(clicked_adjective)
-        filtered_results = [result for result in current_results if clicked_adjective in result['prompt']]
-        result_cards = [
-            create_result_card(os.path.join(THIS_DIR, item["image"]), item["prompt"])
-            for item in filtered_results[:max_results]
-        ]
-        histogram_data = search_engine.get_histogram_data(filtered_results)
-        return result_cards, histogram_data, search_term, filtered_results, selected_adjectives, None
 
-    # TEXT SEARCH LOGIC
-    elif triggered_id == "text-search":
-        current_results, result_cards, histogram_data = text_search(search_term)
-        print()
-        return result_cards, histogram_data, search_term, current_results, [], None
+        if last_search_type == "text":
+            result_cards, histogram_data = text_search(query, selected_adjectives)
+            return result_cards, histogram_data, query, "", selected_adjectives, last_search_type
+        elif last_search_type == "image":
+            result_cards, histogram_data = image_search(image, selected_adjectives)
+            return result_cards, histogram_data, "", image, selected_adjectives, last_search_type
 
     # NULL CASE
-    return [], blank_graph, "", [], "", None
+    return [], blank_graph, "", "", [], ""
 
 
-def text_search(search_term):
-    if not search_term:
-        return None, [], blank_graph
+def text_search(query, selected_adjectives):
+    if not query:
+        return [], blank_graph
 
     # Filter data based on search term (case-insensitive)
-    results, histogram_data = search_engine.get_matching_results(search_term)
+    results, histogram_data = search_engine.get_matching_results(query, selected_adjectives)
 
     # Display results
     if len(results) == 0:
-        return None, "No results found.", blank_graph
+        return "No results found.", blank_graph
 
     result_cards = [
         create_result_card(os.path.join(THIS_DIR, item["image"]), item["prompt"])
-        for item in results[:max_results]
+        for item in results
     ]
-    return results, result_cards, histogram_data
+    return result_cards, histogram_data
 
 
-def image_search(image):
+def image_search(image, selected_adjectives):
     # Cleanup tags before base64 data
     image = re.sub("^data:image/.+;base64,", "", image)
     # Load as PIL image so we can embed it
     loaded_image = Image.open(io.BytesIO(base64.b64decode(image)))
     # Do image search
-    results, histogram_data = search_engine.search_for_image(loaded_image)
+    results, histogram_data = search_engine.search_for_image(loaded_image, selected_adjectives)
 
     if len(results) == 0:
         return "No results found.", blank_graph
 
     result_cards = [
         create_result_card(os.path.join(THIS_DIR, item["image"]), item["prompt"])
-        for item in results[:max_results]
+        for item in results
     ]
 
-    return results, result_cards, histogram_data
+    return result_cards, histogram_data
 
 
 @app.callback(
-        Output('filters-container', 'children'),
-        [Input('selected-adjectives-store', 'data')]
+        Output("filters-container", "children"),
+        [Input("selected-adjectives-store", "data")]
 )
 def update_display(store_data):
     # Check if store_data is not empty
