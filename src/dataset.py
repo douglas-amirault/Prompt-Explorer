@@ -8,7 +8,6 @@ from nltk import word_tokenize, pos_tag
 class Dataset:
 
     def __init__(self, data_path):
-        print("LOADING DATASET")
         self.items = []
         with open("./dataset/examples.jsonl", "r") as json_file:
             for line in tqdm(json_file):

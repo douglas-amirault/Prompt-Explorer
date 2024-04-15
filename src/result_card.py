@@ -1,5 +1,6 @@
 from dash import html
 import base64
+import string
 
 styles = {
     "result-card": {
@@ -25,20 +26,40 @@ styles = {
         "display": "inline", 
         "background-color": "#f2f2f2", 
         "width": "50%", 
-        "padding": "10px",
+        "padding": "1px",
         "border-radius": "10px",
         "font-family": "Arial, sans-serif"
     },
 
     "result-title": {
         "margin-top": "0px",
+        "padding": "2px",
         "font-family": "Arial, sans-serif"
+    },
 
+    "adjective": {
+        "color": "blue"
     }
 }
 
+def format_description(tagged):
+    formatted_description = []
+    for i, (word, tag) in enumerate(tagged):
+        if tag.startswith("JJ"):
+            word_span = html.Span(word, style=styles["adjective"])
+        else:
+            word_span = html.Span(word)
+        
+        formatted_description.append(word_span)
 
-def create_result_card(image_url, description):
+        if i < len(tagged) - 1:
+            next_word, next_tag = tagged[i + 1]
+            if next_word not in string.punctuation:
+                formatted_description.append(" ")
+
+    return html.P(formatted_description, className="result-description", style=styles["result-description"])
+
+def create_result_card(image_url, description, tagged):
     with open(image_url, "rb") as image_file:
         encoded_image = base64.b64encode(image_file.read()).decode("utf-8")
         encoded_image = f"data:image/png;base64,{encoded_image}"
@@ -54,7 +75,7 @@ def create_result_card(image_url, description):
             html.Div(
                 children=[
                     html.H3("Prompt", className="result-title", style=styles["result-title"]),
-                    html.P(description, className="result-description"),
+                    format_description(tagged)
                 ],
                 style=styles["result-description"],
             ),
