@@ -58,11 +58,12 @@ class Dataset:
     def get_global_adjectives(self, num_adjs=8):
         adjectives = [
             word
-            for prompt in [m["prompt"] for m in self.items]
-            for word, tag in pos_tag(word_tokenize(prompt))
+            for result in [m for m in self.items]
+            for word, tag in result["tagged"]
             if tag.startswith("JJ")
         ]
-        common_adjs = Counter(adjectives).most_common(num_adjs)
+        common_adjs = Counter(adjectives)
+        common_adjs = common_adjs.most_common(num_adjs)
         data = {
             "x": [count for adj, count in common_adjs][::-1],
             "y": [adj for adj, count in common_adjs][::-1],
