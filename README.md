@@ -31,6 +31,6 @@ This repository contains code related to the final project of
         poetry shell
         ```
 2. If not using Poetry, run `pip install -r requirements.txt` to install all the required dependencies.
-3. Run `python get_data.py` to download the dataset.
-4. Run `python app.py` to run the web app.
+3. Run `python3 get_data.py` to download the dataset.
+4. Run `python3 app.py` to run the web app.
 5. Navigate to [http://127.0.0.1:8050/](http://127.0.0.1:8050/) to view it in your browser.
