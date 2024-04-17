@@ -103,14 +103,15 @@ app.layout = html.Div(
             [
                 html.Div(
                     id="search-results",
-                    style={"overflow": "auto", "width": "50%", "height": "100vh"},
+                    style={"overflow": "auto", "width": "50%", "height": "100%"},
                 ),
                 html.Div(
                     [
                         html.Div(id="filters-container", style={"margin": "20px"}),
                         dcc.Graph(id="histogram-global", figure=dataset.adjs, style={'height': '350px', 'width': '100%'}),
                         dcc.Graph(id="histogram", figure=blank_graph, style={'height': '405px', 'width': '100%'}),
-                        html.Img(id="word-cloud-image", style={"width": "50%", "height": "auto", "object-fit": "contain"})
+                        html.H2("Word Cloud", style={"text-align": "center", "font-size": "20px", "font-weight": "normal", "font-family": '"Open Sans", verdana'}),
+                        html.Img(id="word-cloud-image", style={"width": "95%", "height": "auto", "object-fit": "contain",  "margin-bottom": "20px"})              
                     ],
                     style={
                         "display": "flex",
