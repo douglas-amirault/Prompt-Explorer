@@ -33,10 +33,10 @@ Prompt Explorer sets itself apart from other prompt engineering tools in the AI 
         poetry shell
         ```
 2. If not using Poetry, run `pip install -r requirements.txt` to install all the required dependencies.
-3. Run `python get_data.py` to download the dataset.
+3. Run `python3 get_data.py` to download the dataset.
 
 ## EXECUTION 
-1. Run `python app.py` to run the web app.
+1. Run `python3 app.py` to run the web app.
 2. Navigate to [http://127.0.0.1:8050/](http://127.0.0.1:8050/) to view it in your browser.
 
 ## DEMO VIDEO
