@@ -40,7 +40,9 @@ Prompt Explorer sets itself apart from other prompt engineering tools in the AI 
 2. Navigate to [http://127.0.0.1:8050/](http://127.0.0.1:8050/) to view it in your browser.
 
 ## DEMO VIDEO
+Here's a demo video of how to get the project running locally for the smaller dataset: https://youtu.be/83tkIujtr_Q?si=HoxtxoOuKLga41GW
 
+For the larger dataset, simply swap our the parameter in the `get_data.py` file.
 ---
 ## Final Project
 This repository contains code related to the final project of
