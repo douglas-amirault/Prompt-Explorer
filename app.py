@@ -215,7 +215,7 @@ def search(
 
 def text_search(query, selected_adjectives):
     if not query:
-        return [], blank_graph
+        return [], blank_graph, "data:image/png;base64,"
 
     # Filter data based on search term (case-insensitive)
     results, histogram_data, cloud = search_engine.get_matching_results(query, selected_adjectives)
@@ -225,7 +225,7 @@ def text_search(query, selected_adjectives):
         return "No results found.", blank_graph, "data:image/png;base64,"
 
     result_cards = [
-        create_result_card(os.path.join(THIS_DIR, item["image"]), item["prompt"])
+        create_result_card(os.path.join(THIS_DIR, item["image"]), item["prompt"], item["tagged"])
         for item in results
     ]
     return result_cards, histogram_data, cloud
@@ -243,7 +243,7 @@ def image_search(image, selected_adjectives):
         return "No results found.", blank_graph, "data:image/png;base64,"
 
     result_cards = [
-        create_result_card(os.path.join(THIS_DIR, item["image"]), item["prompt"])
+        create_result_card(os.path.join(THIS_DIR, item["image"]), item["prompt"], item["tagged"])
         for item in results
     ]
 
